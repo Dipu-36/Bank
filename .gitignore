@@ -1,0 +1,6 @@
+#Ignore These files
+
+.gitignore
+.env
+.ENV 
+
