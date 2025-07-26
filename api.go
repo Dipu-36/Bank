@@ -13,10 +13,11 @@ import (
 // It also encodes the provides value to v & returns an erroor if JSON encoding fails
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
 
-	//sets the status code before writing the headers
-	w.WriteHeader(status)
 	//sets the content type to json
 	w.Header().Set("Content-Type", "application/json")
+
+	//sets the status code before writing the headers
+	w.WriteHeader(status)
 
 	//Encode the response body as JSON
 	//http.ResponseWriter implements io.Writer, which NewEncoder requires
@@ -94,7 +95,9 @@ func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error 
 }
 
 func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
+	account := NewAccount("Diptendu", "Pal")
+
+	return WriteJSON(w, http.StatusOK, account)
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
