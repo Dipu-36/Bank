@@ -11,8 +11,8 @@ type Storage interface {
 	CreateAccount(*Account) error
 	DeleteAccount(int) error
 	UpdateAccount(*Account) error
-	GetAccounts() ([]*Account, error)
 	GetAccountbyID(int) (*Account, error)
+	GetAccounts() ([]*Account, error)
 }
 
 type PostgresStore struct {
@@ -39,12 +39,13 @@ func (s *PostgresStore) Init() error {
 }
 
 func (s *PostgresStore) createAccountTable() error {
-	query := `CREATE TABLE IF NOT EXISTS Account(
+	query := `CREATE TABLE IF NOT EXISTS account(
 		id SERIAL PRIMARY KEY,
 		first_name VARCHAR(50),
 		last_name VARCHAR(50),
 		number SERIAL,
 		balance SERIAL,
+		created_at TIMESTAMP
 		)`
 
 	_, err := s.db.Exec(query)
@@ -53,12 +54,12 @@ func (s *PostgresStore) createAccountTable() error {
 
 func (s *PostgresStore) CreateAccount(acc *Account) error {
 	query := `
-		INSERT INTO Account
+		INSERT INTO account
 		(first_name, last_name, number, balance, created_at)
 		VALUES
 		($1, $2, $3, $4, $5)
 		`
-	resp, err := s.db.Query(query, acc.FirstName, acc.LastName, acc.Balance, acc.Number, acc.CreatedAt)
+	resp, err := s.db.Exec(query, acc.FirstName, acc.LastName, acc.Number, acc.Balance, acc.CreatedAt)
 	if err != nil {
 		return err
 	}
@@ -75,7 +76,7 @@ func (s *PostgresStore) GetAccountbyID(id int) (*Account, error) {
 	return nil, nil
 }
 func (s *PostgresStore) GetAccounts() ([]*Account, error) {
-	rows, err := s.db.Query("SELECT *FROM Acccount")
+	rows, err := s.db.Query("SELECT * FROM account")
 	if err != nil {
 		return nil, err
 	}
