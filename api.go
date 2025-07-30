@@ -63,11 +63,20 @@ func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) err
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
+
+	//Allocating memory for the struct CreateAccountRequest & returning a pointer to that struct
 	createAccountReq := new(CreateAccountRequest)
+
+	//Reading the raw JSON body from the HTTP request & decoding it back to struct, returns an err
 	if err := json.NewDecoder(r.Body).Decode(createAccountReq); err != nil {
 		return err
 	}
+
+	//Calling the constructor function to create a new Account struct and pass the values to in
+	//account variable stores the struct fields, in struct form, decoded from JSON body
 	account := NewAccount(createAccountReq.FirstName, createAccountReq.LastName)
+
+	//Using store field of the APIServer instance s to get the interface methods to store the Account info in DB
 	if err := s.store.CreateAccount(account); err != nil {
 		return err
 	}
