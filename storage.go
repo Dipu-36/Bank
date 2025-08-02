@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -20,7 +21,28 @@ type PostgresStore struct {
 }
 
 func NewPostgresStore() (*PostgresStore, error) {
-	connStr := "host=127.0.0.1 port=5432 user=postgres password=gobank dbname=postgres sslmode=disable"
+	//Get configuration from environment variables
+	host := os.Getenv("DB_HOST")
+	if host == "" {
+		host = "localhost"
+	}
+	port := os.Getenv("DB_PORT")
+	if port == "" {
+		port = "5432"
+	}
+	user := os.Getenv("DB_USER")
+	if user == "" {
+		user = "postgres"
+	}
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+	if dbname == "" {
+		dbname = "postgres"
+	}
+
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbaname=%s sslmode=disabled",
+		host, port, user, password, dbname)
+
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
@@ -44,7 +66,7 @@ func (s *PostgresStore) createAccountTable() error {
 		first_name VARCHAR(50),
 		last_name VARCHAR(50),
 		number SERIAL,
-		balance SERIAL,
+		balance BIGINT,
 		created_at TIMESTAMP
 		)`
 
