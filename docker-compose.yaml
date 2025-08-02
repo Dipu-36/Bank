@@ -1,0 +1,30 @@
+#This file defines all the containers. their configurations, manages ENV variables & dependencies
+version: 3.8
+services: 
+  gobank-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=gobank-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=gobank 
+      - DB_NAME=gobank
+    depends_on:
+      gobank-db:
+        condition: service_healthy
+  gobank-db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=gobank
+    volumes:
+      - pgdata:/var/lib/postgressql/data
+    heatlhcheck:
+      test: ["CMD-SSHELL", "pg_isready -U postgres"]
+      interval: 5s 
+      timeout: 5s 
+      retries: 5 
+volumes:
+  pgdata:
