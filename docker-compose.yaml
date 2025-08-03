@@ -1,5 +1,5 @@
-#This file defines all the containers. their configurations, manages ENV variables & dependencies
-version: 3.8
+# docker-compose.yml
+version: '3.8'  # FIXED: Added quotes around version
 services: 
   gobank-app:
     build: .
@@ -19,10 +19,11 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=gobank
+      - POSTGRES_DB=gobank  # ADDED THIS LINE
     volumes:
-      - pgdata:/var/lib/postgressql/data
-    heatlhcheck:
-      test: ["CMD-SSHELL", "pg_isready -U postgres"]
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s 
       timeout: 5s 
       retries: 5 
