@@ -6,12 +6,18 @@ run: build
 test: 
 	@go test -v ./...
 #Docker operations
-start:
+up:
 	@docker-compose up -d --build
-	@echo "Containers started in background"
-stop:
+	@echo "Containers built & started in background"
+down:
 	@docker-compose down
 	@echo "Contianers stopped and removed"
+start:
+	@docker start bank-gobank-app-1 bank-gobank-db-1
+	@echo "Starting containers...."
+stop:
+	@docker stop bank-gobank-app-1 bank-gobank-db-1 
+	@echo "Continaers have been stopped"
 logs:
 	@docker-compose logs -f
 clean: stop
