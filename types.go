@@ -22,6 +22,7 @@ type Account struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
+// NewAccount is a constructor function that creates and returns a new Account instance
 func NewAccount(firstName, lastName string) *Account {
 	return &Account{
 		FirstName: firstName,

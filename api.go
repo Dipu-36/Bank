@@ -35,7 +35,7 @@ func (s *APIServer) Run() {
 
 	//Registers woutes with our handler decorater
 	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccount))
-	router.HandleFunc("/account/{id}", makeHTTPHandleFunc(s.handleGetAccountbyID))
+	router.HandleFunc("/account/{id}", withJwtAuth(makeHTTPHandleFunc(s.handleGetAccountbyID)))
 	log.Println("JSON API server running on port: ", s.listenAddr)
 	http.ListenAndServe(s.listenAddr, router)
 }
@@ -112,6 +112,13 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	//Encode the response body as JSON
 	//http.ResponseWriter implements io.Writer, which NewEncoder requires
 	return json.NewEncoder(w).Encode(v)
+}
+
+func withJwtAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("calling JWT auth middleware")
+		handlerFunc(w, r)
+	}
 }
 
 // apiFunc defines the signature for the API handler functions that returns errors
