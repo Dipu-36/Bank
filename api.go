@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
@@ -68,10 +69,22 @@ func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) err
 
 func (s *APIServer) handleGetAccountbyID(w http.ResponseWriter, r *http.Request) error {
 	//account := NewAccount("Diptendu", "Pal")
-	id := mux.Vars(r)["id"]
-	fmt.Println(id)
 
-	return WriteJSON(w, http.StatusOK, id)
+	// We are fetching the ID from the request or the param therefore it is going to be in tokenString
+	// therefore we need to convert it to Int using the strconv.Atoi
+
+	idStr := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return fmt.Errorf("Invalid id given %s", idStr)
+	}
+
+	account, err := s.store.GetAccountbyID(id)
+	if err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, account)
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
@@ -199,7 +212,7 @@ type apiFunc func(http.ResponseWriter, *http.Request) error
 // ApiError represents a standerdized error response structure
 // This ensures all API errors allow the same JSON format
 type ApiError struct {
-	Error string
+	Error string `json:"error"`
 }
 
 // makeHTTPHandleFunc converts an apiFunc to a http.HandlerFunc.
